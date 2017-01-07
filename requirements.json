@@ -1,0 +1,8 @@
+{
+	"Go": {
+		"vendor": [
+			"github.com/spf13/cobra/cobra",
+			"github.com/boltdb/bolt/..."
+		]
+	}
+}

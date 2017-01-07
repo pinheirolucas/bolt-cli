@@ -22,3 +22,17 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+/bin/
+/dist/
+/env/
+/log/
+/pkg/
+/run/
+/tmp/
+/vendor/
+*~
+*.vimsession
+
+*.db
+*.db.lock
