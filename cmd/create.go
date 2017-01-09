@@ -36,10 +36,17 @@ var createCmd = &cobra.Command{
 	Use:     "create [path to create the database]",
 	Aliases: []string{"new"},
 	Short:   "Create a new empty BoltDB file",
-	Long:    "",
+	Long: `Create (bolt-cli create) will create a new empty BoltDB file with the specified path.
+
+If no filename is provided, it will create with the name: "bolt.db".
+
+Examples:
+	bolt-cli create ./
+	bolt-cli create ./dev.db
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			er(errors.New("create needs the path of the new BoltDB"))
+			er(errors.New("create expects the path of the new BoltDB"))
 		}
 
 		p := args[0]
