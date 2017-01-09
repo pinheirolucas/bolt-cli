@@ -39,7 +39,7 @@ var createCmd = &cobra.Command{
 	Long:    "",
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			er(errors.New("create needs the filepath of the new BoltDB"))
+			er(errors.New("create needs the path of the new BoltDB"))
 		}
 
 		p := args[0]
