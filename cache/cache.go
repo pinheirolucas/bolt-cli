@@ -23,3 +23,8 @@ func CreateBoltDB(p string) error {
 func CloseBoltDB() {
 	db.Close()
 }
+
+// GetDB use only on tests
+func GetDB() *bolt.DB {
+	return db
+}

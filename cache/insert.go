@@ -1,7 +1,7 @@
 package cache
 
 import (
-	"log"
+	"encoding/json"
 	"reflect"
 
 	"strconv"
@@ -9,6 +9,20 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
 )
+
+// InsertBucketValue create a bucket with the provided name and add the provided value
+func InsertBucketValue(name string, v map[string]interface{}) error {
+	return db.Update(func(tx *bolt.Tx) error {
+		nameb := []byte(name)
+
+		bucket, err := tx.CreateBucketIfNotExists(nameb)
+		if err != nil {
+			return errors.Wrap(err, "creating bucket")
+		}
+
+		return insertJSONValuesIntoBucket(bucket, v)
+	})
+}
 
 // InsertSimpleValue creaate or update some value
 func InsertSimpleValue(b, k, v string) error {
@@ -26,20 +40,15 @@ func InsertSimpleValue(b, k, v string) error {
 	})
 }
 
-// InsertBucketValue create a bucket with the provided name and add the provided value
-func InsertBucketValue(name string, v interface{}) error {
-	iv := v.(map[string]interface{})
+func insertArray(bkt *bolt.Bucket, k string, v []interface{}) error {
+	kb := []byte(k)
 
-	return db.Update(func(tx *bolt.Tx) error {
-		nameb := []byte(name)
+	e, err := json.Marshal(v)
+	if err != nil {
+		return errors.Wrap(err, "wrong array format")
+	}
 
-		bucket, err := tx.CreateBucketIfNotExists(nameb)
-		if err != nil {
-			return errors.Wrap(err, "creating bucket")
-		}
-
-		return insertJSONValuesIntoBucket(bucket, iv)
-	})
+	return bkt.Put(kb, e)
 }
 
 func insertJSONValuesIntoBucket(bkt *bolt.Bucket, value map[string]interface{}) error {
@@ -55,11 +64,11 @@ func insertJSONValuesIntoBucket(bkt *bolt.Bucket, value map[string]interface{}) 
 
 			return insertJSONValuesIntoBucket(nbkt, v.(map[string]interface{}))
 		case reflect.String:
-			return insertString(bkt, k, v.(string))
+			insertString(bkt, k, v.(string))
 		case reflect.Float64:
-			return insertNumber(bkt, k, v.(float64))
+			insertNumber(bkt, k, v.(float64))
 		case reflect.Slice:
-			log.Println("Array:", v)
+			insertArray(bkt, k, v.([]interface{}))
 		default:
 			return errors.New("unsuported type on JSON file")
 		}
@@ -68,18 +77,18 @@ func insertJSONValuesIntoBucket(bkt *bolt.Bucket, value map[string]interface{}) 
 	return nil
 }
 
-func insertString(bkt *bolt.Bucket, k, v string) error {
-	kb := []byte(k)
-	vb := []byte(v)
-
-	return bkt.Put(kb, vb)
-}
-
 func insertNumber(bkt *bolt.Bucket, k string, v float64) error {
 	kb := []byte(k)
 
 	vi := int64(v)
 	vb := []byte(strconv.FormatInt(vi, 10))
+
+	return bkt.Put(kb, vb)
+}
+
+func insertString(bkt *bolt.Bucket, k, v string) error {
+	kb := []byte(k)
+	vb := []byte(v)
 
 	return bkt.Put(kb, vb)
 }
