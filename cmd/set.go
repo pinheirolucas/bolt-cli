@@ -49,8 +49,6 @@ var setCmd = &cobra.Command{
 
 		if setCmdBucket == "" {
 			er(errors.New("a bucket name must be provided"))
-		} else if setCmdKey == "" && setCmdValue != "" {
-			er(errors.New("the --value flag must be provided with a --key"))
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
