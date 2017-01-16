@@ -7,6 +7,11 @@ import (
 
 var db *bolt.DB
 
+// CloseBoltDB ...
+func CloseBoltDB() {
+	db.Close()
+}
+
 // CreateBoltDB ...
 func CreateBoltDB(p string) error {
 	var err error
@@ -17,11 +22,6 @@ func CreateBoltDB(p string) error {
 	}
 
 	return nil
-}
-
-// CloseBoltDB ...
-func CloseBoltDB() {
-	db.Close()
 }
 
 // GetDB use only on tests
