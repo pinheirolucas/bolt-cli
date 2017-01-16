@@ -27,6 +27,8 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/pinheirolucas/bolt-cli/validator"
 )
 
 const defaultDBName = "bolt.db"
@@ -59,7 +61,7 @@ Examples:
 		e := filepath.Ext(absp)
 		switch e {
 		case "":
-			isDir, err := dirExists(absp)
+			isDir, err := validator.DirExists(absp)
 			if err != nil {
 				er(err)
 			} else if !isDir {
@@ -70,7 +72,7 @@ Examples:
 		case ".db":
 			dp := filepath.Dir(absp)
 
-			isDir, err := dirExists(dp)
+			isDir, err := validator.DirExists(dp)
 			if err != nil {
 				er(err)
 			} else if !isDir {

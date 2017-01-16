@@ -23,31 +23,84 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/pinheirolucas/bolt-cli/cache"
+	"github.com/pinheirolucas/bolt-cli/utils"
+	"github.com/pinheirolucas/bolt-cli/validator"
 )
+
+var setCmdKey string
+var setCmdValue string
+var setCmdBucket string
+var setCmdJSON string
 
 // setCmd represents the set command
 var setCmd = &cobra.Command{
 	Use:   "set",
-	Short: "Creates a key or bucket with a given name and value.",
+	Short: "Creates bucket with a given name and value.",
 	Long:  "",
+	PreRun: func(cmd *cobra.Command, args []string) {
+		if err := validator.IsBoltDBValid(args); err != nil {
+			er(err)
+		}
+
+		if setCmdBucket == "" {
+			er(errors.New("a bucket name must be provided"))
+		}
+	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("set called")
+		bp := args[0]
+
+		err := cache.CreateBoltDB(bp)
+		if err != nil {
+			er(err)
+		}
+		defer cache.CloseBoltDB()
+
+		if setCmdKey != "" && setCmdValue != "" {
+			err := cache.InsertSimpleValue(setCmdBucket, setCmdKey, setCmdValue)
+			if err != nil {
+				er(err)
+			}
+		} else if setCmdKey == "" && setCmdValue != "" {
+			err := cache.InsertComplexValue(setCmdBucket, setCmdValue)
+			if err != nil {
+				er(err)
+			}
+		} else if setCmdJSON != "" {
+			err = validator.JSONPathValid(setCmdJSON)
+			if err != nil {
+				er(err)
+			}
+
+			data, err := utils.RetrieveJSONData(setCmdJSON)
+			if err != nil {
+				er(err)
+			}
+
+			err = cache.InsertBucketValue(setCmdBucket, data)
+			if err != nil {
+				er(err)
+			}
+		} else {
+			er(errors.New("invalid combination of arguments"))
+		}
+
+		fmt.Println("The provided values were successfully inserted.")
 	},
 }
 
 func init() {
 	RootCmd.AddCommand(setCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	setCmd.Flags().StringVarP(
+		&setCmdBucket,
+		"bucket", "b", "",
+		"Creates a bucket with the provided name.",
+	)
+	setCmd.Flags().StringVarP(&setCmdKey, "key", "k", "", "The key to be created inside of a bucket.")
+	setCmd.Flags().StringVarP(&setCmdValue, "value", "v", "", "Creates a simple register with the provided value.")
+	setCmd.Flags().StringVarP(&setCmdJSON, "json", "j", "", "Path to a JSON file to insert into a bucket.")
 }
