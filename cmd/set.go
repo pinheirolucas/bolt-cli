@@ -21,15 +21,14 @@
 package cmd
 
 import (
-	"errors"
-
 	"fmt"
 
-	"github.com/pinheirolucas/bolt-cli/validator"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/pinheirolucas/bolt-cli/cache"
 	"github.com/pinheirolucas/bolt-cli/utils"
+	"github.com/pinheirolucas/bolt-cli/validator"
 )
 
 var setCmdKey string
