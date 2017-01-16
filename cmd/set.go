@@ -63,13 +63,14 @@ var setCmd = &cobra.Command{
 		defer cache.CloseBoltDB()
 
 		if setCmdKey != "" && setCmdValue != "" {
-			if validator.IsComplexValue(setCmdValue) {
-				// Insert complex value here
-			} else {
-				err := cache.InsertSimpleValue(setCmdBucket, setCmdKey, setCmdValue)
-				if err != nil {
-					er(err)
-				}
+			err := cache.InsertSimpleValue(setCmdBucket, setCmdKey, setCmdValue)
+			if err != nil {
+				er(err)
+			}
+		} else if setCmdKey == "" && setCmdValue != "" {
+			err := cache.InsertComplexValue(setCmdBucket, setCmdValue)
+			if err != nil {
+				er(err)
 			}
 		} else if setCmdJSON != "" {
 			err = validator.JSONPathValid(setCmdJSON)

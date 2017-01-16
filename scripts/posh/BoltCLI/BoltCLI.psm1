@@ -4,7 +4,7 @@ $script:ProjectName = "bolt-cli"
 $script:ProjectRoot = (Join-Path "W:/md/src/github.com/pinheirolucas/" "$script:ProjectName")
 $script:ProjectGoImport = "$env:CtlrSrcName/$script:ProjectName"
 
-function BoltTest {
+function Start-BoltTest {
 	param (
 		$Package="./..."
 	)
@@ -14,5 +14,5 @@ function BoltTest {
 
 Export-ModuleMember -Alias @("??") `
 	-Function @(
-		"BoltTest"
+		"Start-BoltTest"
 	)

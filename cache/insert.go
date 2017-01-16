@@ -8,6 +8,8 @@ import (
 
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
+
+	"github.com/pinheirolucas/bolt-cli/utils"
 )
 
 // InsertBucketValue create a bucket with the provided name and add the provided value
@@ -22,6 +24,22 @@ func InsertBucketValue(name string, v map[string]interface{}) error {
 
 		return insertJSONValuesIntoBucket(bucket, v)
 	})
+}
+
+// InsertComplexValue create a bucket with the provided name.
+// The values are represented by a []string
+func InsertComplexValue(name string, cv string) error {
+	ccv, err := utils.FromComplexValue(cv)
+	if err != nil {
+		return errors.Wrap(err, "converting from complex value")
+	}
+
+	err = InsertBucketValue(name, ccv)
+	if err != nil {
+		return errors.Wrap(err, "inserting values into bucket")
+	}
+
+	return nil
 }
 
 // InsertSimpleValue creaate or update some value

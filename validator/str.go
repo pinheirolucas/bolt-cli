@@ -30,7 +30,7 @@ func IsComplexValue(v string) bool {
 	}
 
 	nv := strings.TrimPrefix(v, KVSTART)
-	nv = strings.TrimSuffix(v, KVEND)
+	nv = strings.TrimSuffix(nv, KVEND)
 
 	if (len(strings.Split(nv, KVDELIM)) % 2) > 0 {
 		return false
